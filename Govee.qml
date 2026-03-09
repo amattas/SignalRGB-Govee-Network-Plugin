@@ -23,7 +23,7 @@ Item {
                 id: grid
                 anchors.fill: parent
                 columns: 3
-                rowSpacing: 2
+                rowSpacing: 0
                 columnSpacing: 2
 
                 Text{
@@ -31,11 +31,13 @@ Item {
                     Layout.column: 0
                     Layout.columnSpan: 3
                     Layout.fillWidth: true
+                    Layout.preferredHeight: 44
+
                     color: "White"
                     text: "Manually Specify IP Address" 
                     font.family: theme.primaryfont
                     font.weight: Font.Bold
-                    font.pixelSize: 20
+                    font.pixelSize: 24
                 }
 
                 TextField {
@@ -43,6 +45,7 @@ Item {
                     Layout.column: 0
                     Layout.fillWidth: false
                     Layout.preferredWidth: 323
+                    Layout.preferredHeight: 44
 
                     id: discoverIP
                     color: theme.secondarytextcolor
@@ -105,37 +108,34 @@ Item {
                     }
                 }
 
-                BusyIndicator {
-                    id: scanningIndicator
-                    anchors.left: checkButton.right
-                    anchors.leftMargin: 10
-
-                    Layout.row: 2
+                RowLayout {
+                    Layout.row: 1
                     Layout.column: 1
-                    Layout.columnSpan: 1
+                    Layout.columnSpan: 2
                     Layout.fillWidth: true
-                    
-                    Material.accent: "#88FFFFFF"
-                    running: true
-                    implicitWidth: 40
-                    implicitHeight: 40
-                }  
+                    Layout.alignment: Qt.AlignVCenter
 
-                Text{
-                    id: scanningText
-                    anchors.left: scanningIndicator.right
-                    anchors.leftMargin: 10
+                    spacing: 10
 
-                    Layout.row: 2
-                    Layout.column: 2
-                    Layout.columnSpan: 1
-                    Layout.fillWidth: true
+                    BusyIndicator {
+                        id: scanningIndicator
+                        Layout.alignment: Qt.AlignVCenter
+                        Material.accent: "#88FFFFFF"
+                        running: true
+                        implicitWidth: 40
+                        implicitHeight: 40
+                    }
 
-                    verticalAlignment: Text.AlignVCenter
-                    color: "#88FFFFFF"
-                    text: "Searching network for devices. \nThis may take several minutes..." 
-                    font.pixelSize: 14
-                    font.family: "Red Hat Display"
+                    Text {
+                        id: scanningText
+                        Layout.alignment: Qt.AlignVCenter
+                        Layout.fillWidth: true
+                        verticalAlignment: Text.AlignVCenter
+                        color: "#88FFFFFF"
+                        text: "Searching network for devices. \nThis may take several minutes..."
+                        font.pixelSize: 14
+                        font.family: "Red Hat Display"
+                    }
                 }
             }
         }
