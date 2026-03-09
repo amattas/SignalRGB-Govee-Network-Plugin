@@ -66,10 +66,12 @@ Item {
                     Layout.row: 2
                     Layout.column: 0
                     Layout.fillWidth: true
+                    Layout.preferredHeight: 44
 
                     SButton{
                         id: cacheButton
                         width: 156
+                        height: 44
 
                         color: hovered ? Qt.darker("#304152", 1.5) : "#304152"
 
@@ -86,6 +88,7 @@ Item {
                     SButton{
                         id: checkButton
                         width: 156
+                        height: 44
                         anchors.left: cacheButton.right
                         anchors.leftMargin: 10
 
