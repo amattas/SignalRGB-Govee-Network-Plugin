@@ -26,6 +26,8 @@ export function ControllableParameters() {
 
 /** @type {GoveeProtocol} */
 let govee;
+/** @type {Array} Registered subdevices for SKUs with usesSubDevices:true */
+let subdevices = [];
 
 export function Initialize(){
 	device.addFeature("base64");
@@ -47,6 +49,7 @@ export function Initialize(){
 	UDPServer.start();
 	//Establish a new udp server. This is now required for using udp.send.
 
+	ClearSubdevices();
 	fetchDeviceInfoFromTableAndConfigure();
 
 	govee = new GoveeProtocol(controller.ip, controller.supportDreamView, controller.supportRazer);
@@ -77,24 +80,78 @@ function fetchDeviceInfoFromTableAndConfigure() {
 		const GoveeDeviceInfo = GoveeDeviceLibrary[controller.sku];
 		device.setName(`Govee ${GoveeDeviceInfo.sku} - ${GoveeDeviceInfo.name}`);
 
-		let channelLedCount = GoveeDeviceInfo.ledCount;
 		if(GoveeDeviceInfo.usesSubDevices && Array.isArray(GoveeDeviceInfo.subdevices)){
-			channelLedCount = GoveeDeviceInfo.subdevices.reduce(
-				(sum, sd) => sum + (sd.ledCount || 0), 0);
-			device.log(`Subdevice SKU ${GoveeDeviceInfo.sku}: summed ${GoveeDeviceInfo.subdevices.length} subdevices -> ${channelLedCount} total LEDs`);
+			device.SetIsSubdeviceController(true);
+			for(const sd of GoveeDeviceInfo.subdevices){
+				CreateSubDevice(sd);
+			}
+			const total = GoveeDeviceInfo.subdevices.reduce((s, sd) => s + (sd.ledCount || 0), 0);
+			device.log(`Subdevice SKU ${GoveeDeviceInfo.sku}: ${GoveeDeviceInfo.subdevices.length} subdevices / ${total} LEDs total`);
+		}else{
+			device.SetIsSubdeviceController(false);
+			device.addChannel(`Channel 1`, GoveeDeviceInfo.ledCount);
+			device.channel(`Channel 1`).SetLedLimit(GoveeDeviceInfo.ledCount);
+			device.SetLedLimit(GoveeDeviceInfo.ledCount);
 		}
-
-		device.addChannel(`Channel 1`, channelLedCount);
-		device.channel(`Channel 1`).SetLedLimit(channelLedCount);
-		device.SetLedLimit(channelLedCount);
 	}else{
 		device.log(`SKU (${controller.sku}) not found on the library, using 30 LEDs!`);
 		device.setName(`Govee: ${controller.sku}`);
+		device.SetIsSubdeviceController(false);
 		device.addChannel(`Channel 1`, 30);
 		device.channel(`Channel 1`).SetLedLimit(30);
 		device.SetLedLimit(30);
 	}
+}
 
+function ClearSubdevices(){
+	for(const sd of device.getCurrentSubdevices()){
+		device.removeSubdevice(sd);
+	}
+	subdevices = [];
+}
+
+function CreateSubDevice(subdevice){
+	const count = device.getCurrentSubdevices().length;
+	subdevice.id = `${subdevice.name} ${count + 1}`;
+	device.createSubdevice(subdevice.id);
+	device.setSubdeviceName(subdevice.id, subdevice.name);
+	device.setSubdeviceImage(subdevice.id, controller.deviceImage);
+	device.setSubdeviceSize(subdevice.id, subdevice.size[0], subdevice.size[1]);
+	device.setSubdeviceLeds(subdevice.id, subdevice.ledNames, subdevice.ledPositions);
+	subdevices.push(subdevice);
+}
+
+function GetRGBFromSubdevices(overrideColor){
+	const RGBData = [];
+	let idx = 0;
+	for(const sd of subdevices){
+		for(let i = 0; i < sd.ledPositions.length; i++){
+			const pos = sd.ledPositions[i];
+			let color;
+			if(overrideColor){
+				color = hexToRgb(overrideColor);
+			}else if(LightingMode === "Forced"){
+				color = hexToRgb(forcedColor);
+			}else{
+				try {
+					color = device.subdeviceColor(sd.id, pos[0], pos[1]);
+				} catch(e) {
+					color = [0, 0, 0];
+				}
+			}
+			RGBData[idx * 3    ] = color[0];
+			RGBData[idx * 3 + 1] = color[1];
+			RGBData[idx * 3 + 2] = color[2];
+			idx++;
+		}
+	}
+	return RGBData;
+}
+
+function hexToRgb(hex){
+	const m = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+	if(!m) return [0, 0, 0];
+	return [parseInt(m[1], 16), parseInt(m[2], 16), parseInt(m[3], 16)];
 }
 
 // -------------------------------------------<( Discovery Service )>--------------------------------------------------
@@ -613,22 +670,26 @@ class GoveeProtocol {
 	}
 
 	SendRGB(overrideColor) {
-		const ChannelLedCount = device.channel(`Channel 1`).LedCount();
-		const componentChannel = device.channel(`Channel 1`);
-
 		let RGBData = [];
 		let packet  = [];
 
-		if(overrideColor) {
-			RGBData = device.createColorArray(overrideColor, ChannelLedCount, "Inline");
-		}else if(LightingMode === "Forced"){
-			RGBData = device.createColorArray(forcedColor, ChannelLedCount, "Inline");
-		}else if(componentChannel.shouldPulseColors()){
-			const pulseColor = device.getChannelPulseColor(`Channel 1`);
-			const pulseCount = device.channel(`Channel 1`).LedLimit();
-			RGBData = device.createColorArray(pulseColor, pulseCount, "Inline");
+		if(subdevices.length > 0){
+			RGBData = GetRGBFromSubdevices(overrideColor);
 		}else{
-			RGBData = device.channel(`Channel 1`).getColors("Inline");
+			const ChannelLedCount = device.channel(`Channel 1`).LedCount();
+			const componentChannel = device.channel(`Channel 1`);
+
+			if(overrideColor) {
+				RGBData = device.createColorArray(overrideColor, ChannelLedCount, "Inline");
+			}else if(LightingMode === "Forced"){
+				RGBData = device.createColorArray(forcedColor, ChannelLedCount, "Inline");
+			}else if(componentChannel.shouldPulseColors()){
+				const pulseColor = device.getChannelPulseColor(`Channel 1`);
+				const pulseCount = device.channel(`Channel 1`).LedLimit();
+				RGBData = device.createColorArray(pulseColor, pulseCount, "Inline");
+			}else{
+				RGBData = device.channel(`Channel 1`).getColors("Inline");
+			}
 		}
 
 		switch (protocolSelect) {
