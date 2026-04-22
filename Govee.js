@@ -1,8 +1,8 @@
 import udp from "@SignalRGB/udp";
-export function Name() { return "Govee"; }
-export function Version() { return "1.0.0"; }
+export function Name() { return "Govee (Network)"; }
+export function Version() { return "2.0.0-alpha.1"; }
 export function Type() { return "network"; }
-export function Publisher() { return "WhirlwindFX"; }
+export function Publisher() { return "RobThePCGuy"; }
 export function Size() { return [22, 1]; }
 export function SubdeviceController() { return true; }
 /* global
