@@ -76,9 +76,17 @@ function fetchDeviceInfoFromTableAndConfigure() {
 	if(GoveeDeviceLibrary.hasOwnProperty(controller.sku)){
 		const GoveeDeviceInfo = GoveeDeviceLibrary[controller.sku];
 		device.setName(`Govee ${GoveeDeviceInfo.sku} - ${GoveeDeviceInfo.name}`);
-		device.addChannel(`Channel 1`, GoveeDeviceInfo.ledCount);
-		device.channel(`Channel 1`).SetLedLimit(GoveeDeviceInfo.ledCount);
-		device.SetLedLimit(GoveeDeviceInfo.ledCount);
+
+		let channelLedCount = GoveeDeviceInfo.ledCount;
+		if(GoveeDeviceInfo.usesSubDevices && Array.isArray(GoveeDeviceInfo.subdevices)){
+			channelLedCount = GoveeDeviceInfo.subdevices.reduce(
+				(sum, sd) => sum + (sd.ledCount || 0), 0);
+			device.log(`Subdevice SKU ${GoveeDeviceInfo.sku}: summed ${GoveeDeviceInfo.subdevices.length} subdevices -> ${channelLedCount} total LEDs`);
+		}
+
+		device.addChannel(`Channel 1`, channelLedCount);
+		device.channel(`Channel 1`).SetLedLimit(channelLedCount);
+		device.SetLedLimit(channelLedCount);
 	}else{
 		device.log(`SKU (${controller.sku}) not found on the library, using 30 LEDs!`);
 		device.setName(`Govee: ${controller.sku}`);
