@@ -59,15 +59,30 @@ Full plan details in the repo issue tracker.
 
 ## Installation
 
-Click the badge at the top of this README, or manually drop `Govee.js` and
-`Govee.qml` into `%USERPROFILE%\Documents\WhirlwindFX\Plugins\Govee\`.
+### Once this repo is public
+Click the badge at the top of this README. SignalRGB will install it as a
+standalone addon and you can uninstall the upstream Govee addon.
 
-If you already have the official SignalRGB Govee plugin installed, uninstall it
-first — both plugins share the same PID/VID match logic and you want this fork
-to be the one that picks up your devices.
+### While this repo is private (dev mode)
+Install the official SignalRGB Govee addon from the marketplace first (leave
+it installed and enabled) — it's what registers the plugin's PID/VID routing
+with SignalRGB's core. Then drop this repo's `Govee.js` and `Govee.qml` into:
+
+```
+%USERPROFILE%\Documents\WhirlwindFX\Plugins\Govee\
+```
+
+Files in that directory override the addon's shipped copies. Reload via
+**Settings → Developer → Reload Plugins** (or restart SignalRGB). If you
+uninstall the upstream addon while the repo is private, nothing registers
+the plugin with SignalRGB and devices won't route.
 
 ## Troubleshooting
 
+- **Plugin loads but no devices ever appear** — while this repo is private,
+  make sure the upstream SignalRGB Govee addon is still installed and enabled.
+  The addon provides the plugin-type registration with SignalRGB's core; our
+  files in `Plugins/Govee/` only override the JS/QML on top of it.
 - **Device not discovered** — verify LAN Control is enabled in the Govee Home
   app, reserve a static IP for the device in your router, and try the
   "Cache Device" button in the plugin settings with the device's IP typed in.
