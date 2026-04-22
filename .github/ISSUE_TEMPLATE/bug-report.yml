@@ -1,0 +1,61 @@
+name: Bug report
+description: Report a malfunction
+title: "[Bug] "
+labels: ["bug"]
+body:
+  - type: input
+    id: plugin-version
+    attributes:
+      label: Plugin version
+      description: Shown in the SignalRGB device page or in the Govee.js `Version()` export. Also acceptable as a commit SHA.
+      placeholder: "2.0.0-alpha.1"
+    validations:
+      required: true
+  - type: input
+    id: signalrgb-version
+    attributes:
+      label: SignalRGB version
+      placeholder: "2.2.9"
+    validations:
+      required: true
+  - type: input
+    id: device-skus
+    attributes:
+      label: Affected device SKU(s)
+      placeholder: "H70BC, H619A"
+    validations:
+      required: true
+  - type: dropdown
+    id: protocol
+    attributes:
+      label: Which protocol is selected in the plugin settings?
+      options:
+        - DreamviewV1
+        - DreamviewV2
+        - RazerV1
+        - RazerV2
+        - Static
+        - "Not sure / varies per device"
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: What happened vs. what you expected
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to reproduce
+      description: Please include effect name, brightness, any relevant setting toggles.
+    validations:
+      required: true
+  - type: textarea
+    id: log
+    attributes:
+      label: Log excerpt
+      description: Contents of the most recent log file at %AppData%\WhirlwindFX\SignalRGB\logs during the repro. Redact any LAN IPs you want private.
+      render: shell
+    validations:
+      required: true

@@ -1,0 +1,57 @@
+name: SKU request
+description: Request support for a new Govee device
+title: "[SKU] Add support for H____"
+labels: ["sku-request"]
+body:
+  - type: input
+    id: sku
+    attributes:
+      label: Model / SKU
+      description: The H-code on the bottom of the device or on its Govee Home listing (e.g. H70BC).
+      placeholder: "H70BC"
+    validations:
+      required: true
+  - type: input
+    id: product-name
+    attributes:
+      label: Product name
+      description: The marketing name (e.g. "Netflix Curtain Lights").
+    validations:
+      required: true
+  - type: dropdown
+    id: lan-control
+    attributes:
+      label: LAN Control enabled in the Govee Home app?
+      options:
+        - "Yes"
+        - "No"
+        - "Not sure / not available in the app"
+    validations:
+      required: true
+  - type: dropdown
+    id: razer
+    attributes:
+      label: Listed as Razer Chroma Connect compatible on desktop.govee.com/razer/devices?
+      options:
+        - "Yes"
+        - "No"
+        - "Not sure"
+    validations:
+      required: true
+  - type: input
+    id: led-count
+    attributes:
+      label: Per-segment LED count
+      description: Open the Razer segments view in the Govee Home app; the total segment count is the LED count we need. If segments aren't shown, leave blank.
+      placeholder: "30"
+  - type: textarea
+    id: subdevice-layout
+    attributes:
+      label: Physical layout (if multi-segment)
+      description: For light bars, curtains, glides, etc. — describe the physical arrangement (e.g. "2 bars, 10 LEDs each" or "20 vertical strands of 20 LEDs").
+  - type: textarea
+    id: diagnostic-log
+    attributes:
+      label: Diagnostic log excerpt
+      description: (Optional — available in v2.1.4+.) Enable diagnostic logging in the plugin settings, reproduce, paste the log excerpt that shows the device's scan response.
+      render: shell

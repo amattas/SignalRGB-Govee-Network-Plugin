@@ -1,0 +1,47 @@
+name: Lint
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  parse-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Syntax-check Govee.js as ESM
+        run: |
+          cp Govee.js /tmp/check.mjs
+          node --check /tmp/check.mjs
+      - name: Detect duplicate SKU keys in device library
+        run: |
+          node -e "
+            const fs = require('fs');
+            const src = fs.readFileSync('Govee.js', 'utf8');
+            const matches = [...src.matchAll(/^\s+(H[0-9]{3,4}[A-Z]?)\s*:\s*\{/gm)].map(m => m[1]);
+            const allowedDuplicates = new Set(['H619A']); // tracked in plan B2, resolved in v2.1.0
+            const seen = new Set(), dups = new Set(), unexpectedDups = [];
+            for (const k of matches) {
+              if (seen.has(k)) {
+                dups.add(k);
+                if (!allowedDuplicates.has(k)) unexpectedDups.push(k);
+              }
+              seen.add(k);
+            }
+            if (unexpectedDups.length) {
+              console.error('Unexpected duplicate SKU keys:', unexpectedDups);
+              process.exit(1);
+            }
+            console.log('OK —', seen.size, 'unique SKUs,', matches.length, 'total blocks,',
+                        dups.size, 'known duplicate(s):', [...dups]);
+          "
+      - name: Validate devices.override.json if present
+        run: |
+          if [ -f devices.override.json ]; then
+            node -e "JSON.parse(require('fs').readFileSync('devices.override.json','utf8'))"
+          fi
