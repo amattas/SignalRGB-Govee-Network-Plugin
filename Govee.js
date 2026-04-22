@@ -1591,4 +1591,40 @@ const GoveeDeviceLibrary = {
 		supportDreamView: true,
 		ledCount: 108
 	},
+	H607C: {
+		name: "RGBICWW Floor Lamp 2",
+		deviceImage: "https://assets.signalrgb.com/devices/brands/govee/wifi/h6072.png",
+		sku: "H607C",
+		state: 1,
+		supportRazer: true,
+		supportDreamView: true,
+		ledCount: 15
+	},
+	H6088: {
+		name: "RGBIC Cube Wall Sconces",
+		deviceImage: "https://assets.signalrgb.com/devices/brands/govee/wifi/h6087.png",
+		sku: "H6088",
+		state: 1,
+		supportRazer: false,
+		supportDreamView: false,
+		ledCount: 1
+	},
+	H6008: {
+		name: "Wi-Fi + Bluetooth Smart LED Bulb (A19)",
+		deviceImage: "https://assets.signalrgb.com/devices/brands/govee/wifi/h6008.png",
+		sku: "H6008",
+		state: 1,
+		supportRazer: false,
+		supportDreamView: false,
+		ledCount: 1
+	},
+	H61E5: {
+		name: "COB Strip Light Pro",
+		deviceImage: "https://assets.signalrgb.com/devices/brands/govee/wifi/h61e5.png",
+		sku: "H61E5",
+		state: 1,
+		supportRazer: false,
+		supportDreamView: false,
+		ledCount: 1
+	},
 };
