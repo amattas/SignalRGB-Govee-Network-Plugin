@@ -59,30 +59,34 @@ Full plan details in the repo issue tracker.
 
 ## Installation
 
-### Once this repo is public
-Click the badge at the top of this README. SignalRGB will install it as a
-standalone addon and you can uninstall the upstream Govee addon.
+### One-click (once this repo is public)
+Click the badge at the top of this README.
 
-### While this repo is private (dev mode)
-Install the official SignalRGB Govee addon from the marketplace first (leave
-it installed and enabled) — it's what registers the plugin's PID/VID routing
-with SignalRGB's core. Then drop this repo's `Govee.js` and `Govee.qml` into:
+### Manual install
+Drop `GoveeNetwork.js` and `GoveeNetwork.qml` into:
 
 ```
-%USERPROFILE%\Documents\WhirlwindFX\Plugins\Govee\
+%USERPROFILE%\Documents\WhirlwindFX\Plugins\GoveeNetwork\
 ```
 
-Files in that directory override the addon's shipped copies. Reload via
-**Settings → Developer → Reload Plugins** (or restart SignalRGB). If you
-uninstall the upstream addon while the repo is private, nothing registers
-the plugin with SignalRGB and devices won't route.
+Reload via **Settings → Developer → Reload Plugins** (or restart SignalRGB).
+
+This plugin is standalone — it doesn't depend on the upstream Govee addon
+being installed. The folder and filenames are deliberately different from
+the upstream plugin's (`Govee.js`, `Govee.qml`) so SignalRGB registers this
+as its own plugin instead of treating it as an override. You can install
+both side-by-side; SignalRGB will present two plugin entries for Govee
+devices, and you can pick which one binds to each device. If you want
+this fork to be the only one, just uninstall the upstream Govee addon
+from SignalRGB's marketplace.
 
 ## Troubleshooting
 
-- **Plugin loads but no devices ever appear** — while this repo is private,
-  make sure the upstream SignalRGB Govee addon is still installed and enabled.
-  The addon provides the plugin-type registration with SignalRGB's core; our
-  files in `Plugins/Govee/` only override the JS/QML on top of it.
+- **Plugin loads but no devices ever appear** — confirm the install folder is
+  `Plugins\GoveeNetwork\` (not `Plugins\Govee\`) and the files inside are
+  `GoveeNetwork.js` + `GoveeNetwork.qml`. Using the upstream plugin's folder
+  name makes SignalRGB treat this as an override of that addon rather than
+  as a standalone plugin.
 - **Device not discovered** — verify LAN Control is enabled in the Govee Home
   app, reserve a static IP for the device in your router, and try the
   "Cache Device" button in the plugin settings with the device's IP typed in.
