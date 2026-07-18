@@ -104,10 +104,10 @@ test("H6047 exposes two vertical six-zone light bars", () => {
 	assert.deepEqual(Array.from(h6047.subdevices, sd => sd.name), ["Left Light Bar", "Right Light Bar"]);
 	assert.deepEqual(JSON.parse(JSON.stringify(h6047.subdevices.map(sd => sd.size))), [[1, 6], [1, 6]]);
 	assert.deepEqual(JSON.parse(JSON.stringify(h6047.subdevices[0].ledPositions)), [[0, 5], [0, 4], [0, 3], [0, 2], [0, 1], [0, 0]]);
-	assert.deepEqual(JSON.parse(JSON.stringify(h6047.subdevices[1].ledPositions)), [[0, 5], [0, 4], [0, 3], [0, 2], [0, 1], [0, 0]]);
+	assert.deepEqual(JSON.parse(JSON.stringify(h6047.subdevices[1].ledPositions)), [[0, 0], [0, 1], [0, 2], [0, 3], [0, 4], [0, 5]]);
 });
 
-test("H6047 flattens left then right protocol zones from bottom to top", () => {
+test("H6047 flattens the serpentine chain: left bottom-to-top, right top-to-bottom", () => {
 	const runtime = loadPlugin();
 	const subdevices = runtime.GoveeDeviceLibrary.H6047.subdevices;
 	subdevices[0].id = "left";
@@ -121,12 +121,12 @@ test("H6047 flattens left then right protocol zones from bottom to top", () => {
 		10, 0, 2,
 		10, 0, 1,
 		10, 0, 0,
-		20, 0, 5,
-		20, 0, 4,
-		20, 0, 3,
-		20, 0, 2,
-		20, 0, 1,
 		20, 0, 0,
+		20, 0, 1,
+		20, 0, 2,
+		20, 0, 3,
+		20, 0, 4,
+		20, 0, 5,
 	]);
 });
 
